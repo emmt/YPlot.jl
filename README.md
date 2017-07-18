@@ -1,6 +1,6 @@
-# WorkPlot.jl
+# YPlot.jl
 
-Some plotting utilities for Julia.  For now the backend is
+A simplified plotting package for Julia.  For now, the backend is
 [PyPlot](https://github.com/stevengj/PyPlot.jl), the syntax is somewhat
 reminiscent of Yorick.
 
