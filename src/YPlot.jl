@@ -81,7 +81,7 @@ function pli{T}(z::AbstractArray{T,2};
     plt.imshow(transpose(z), vmin=min, vmax=max, interpolation=interp,
                cmap=cmap, origin=origin, extent=extent)
     cbar && plt.colorbar()
-    addtitles(title, xtitle, ytitle)
+    addtitles(title, xlabel, ylabel)
 end
 
 """
@@ -105,7 +105,7 @@ function plg(x, y, s=nothing;
              ylabel::AbstractString = "")
     _preplot(fig, clear)
     plt.plot(x, y, s, linewidth=linewidth)
-    addtitles(title, xtitle, ytitle)
+    addtitles(title, xlabel, ylabel)
 end
 
 _preplot(::Void, clear::Bool) = (clear &&  plt.clf(); nothing)
