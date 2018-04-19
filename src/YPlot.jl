@@ -78,8 +78,8 @@ extent(::Type{OriginUpper}, xmin::Real, xmax::Real, ymin::Real, ymax::Real) =
 
 """
 ```julia
-plmat( A [title,] [xlabel, ylabel,]; kwds...)
-plmat!(A [title,] [xlabel, ylabel,]; kwds...)
+plmat( A [title,] [ylabel, xlabel,]; kwds...)
+plmat!(A [title,] [ylabel, xlabel,]; kwds...)
 plimg( A [title,] [xlabel, ylabel,]; kwds...)
 plimg!(A [title,] [xlabel, ylabel,]; kwds...)
 ```
@@ -149,23 +149,36 @@ end
 plmat(A::AbstractMatrix, title::AbstractString; kwds...) =
     plmat(A; title=title, kwds...)
 
-function plmat(A::AbstractMatrix, xlabel::AbstractString,
-               ylabel::AbstractString; kwds...)
+function plmat(A::AbstractMatrix, ylabel::AbstractString,
+               xlabel::AbstractString; kwds...)
     plmat(A; xlabel=xlabel, ylabel=ylabel, kwds...)
 end
 
 function plmat(A::AbstractMatrix, title::AbstractString,
-               xlabel::AbstractString, ylabel::AbstractString; kwds...)
+               ylabel::AbstractString, xlabel::AbstractString; kwds...)
     plmat(A; title=title, xlabel=xlabel, ylabel=ylabel, kwds...)
 end
 
-function plimg(A::AbstractMatrix, args...;
+function plimg(A::AbstractMatrix;
                origin = image_origin(),
                extent = image_extent(origin, A),
                aspect = image_aspect(),
                kwds...)
-    plmat(transpose(A), args...;
+    plmat(transpose(A);
           aspect=aspect, extent=extent, origin=origin, kwds...)
+end
+
+plimg(A::AbstractMatrix, title::AbstractString; kwds...) =
+    plimg(A; title=title, kwds...)
+
+function plimg(A::AbstractMatrix, xlabel::AbstractString,
+               ylabel::AbstractString; kwds...)
+    plimg(A; xlabel=xlabel, ylabel=ylabel, kwds...)
+end
+
+function plimg(A::AbstractMatrix, title::AbstractString,
+               xlabel::AbstractString, ylabel::AbstractString; kwds...)
+    plimg(A; title=title, xlabel=xlabel, ylabel=ylabel, kwds...)
 end
 
 plmat!(args...; kwds...) = plmat(args...; clear=false, kwds...)
