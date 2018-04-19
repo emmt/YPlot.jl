@@ -171,8 +171,6 @@ end
 plmat!(args...; kwds...) = plmat(args...; clear=false, kwds...)
 plimg!(args...; kwds...) = plimg(args...; clear=false, kwds...)
 
-const pli = plimg
-
 @doc @doc(plmat) plmap!
 @doc @doc(plmat) plimg
 @doc @doc(plmat) plimg!
@@ -237,5 +235,8 @@ function addtitles(title::AbstractString, xlabel::AbstractString,
     length(ylabel) > 0 && plt.ylabel(ylabel)
     nothing
 end
+
+# Deprecations.
+@deprecate pli plimg
 
 end # module
