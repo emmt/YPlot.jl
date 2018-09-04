@@ -10,18 +10,15 @@ export
     clf,
     fig
 
-# FIXME: There is a conflict between using Tk and Gtk backend, use Qt backend
-# for now...
+using Compat
 using PyCall
-#pygui(:qt); # can be: :wx, :gtk, :qt
-
 using LaTeXStrings
 
 import PyPlot
 import PyPlot: clf
 const plt = PyPlot;
 
-plt.pygui(true)
+#plt.pygui(true)
 
 abstract type Origin end
 struct OriginUpper  <: Origin end
@@ -164,7 +161,7 @@ function plimg(A::AbstractMatrix;
                extent = image_extent(origin, A),
                aspect = image_aspect(),
                kwds...)
-    plmat(transpose(A);
+    plmat(permutedims(A);
           aspect=aspect, extent=extent, origin=origin, kwds...)
 end
 
@@ -196,7 +193,7 @@ create a new plotting figure or select an existing figure.
 
 """
 fig() = plt.figure()
-fig(::Void) = plt.figure()
+fig(::Nothing) = plt.figure()
 fig(f::Union{Integer,plt.Figure}) = plt.figure(f)
 
 """
@@ -209,7 +206,7 @@ clears the current figure, while
 selects figure `f` and clears it.
 
 """
-clf(::Void) = plt.clf()
+clf(::Nothing) = plt.clf()
 clf(f::Union{Integer,plt.Figure}) = (plt.figure(f); plt.clf())
 
 
@@ -237,7 +234,7 @@ function plg(x, y, s=nothing;
     addtitles(title, xlabel, ylabel)
 end
 
-preparefigure(::Void, clear::Bool) = (clear &&  plt.clf(); nothing)
+preparefigure(::Nothing, clear::Bool) = (clear &&  plt.clf(); nothing)
 preparefigure(fig::Union{Integer,plt.Figure}, clear::Bool) =
     (plt.figure(fig); clear &&  plt.clf(); nothing)
 

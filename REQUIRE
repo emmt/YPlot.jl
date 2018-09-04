@@ -1,2 +1,5 @@
 julia 0.6
-PyPlot 2.0
+LaTeXStrings
+PyCall
+PyPlot 2
+Compat 0.41
