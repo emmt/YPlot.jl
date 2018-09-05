@@ -79,7 +79,8 @@ If symbolic links `libpython*.so` do not exists in `/usr/lib`, create them
 (needed for `PyCall` build to find the Python library):
 
 ```sh
-sudo ln -s x86_64-linux-gnu/libpython*.so /usr/lib
+cd /usr/lib
+sudo ln -s x86_64-linux-gnu/libpython*.so .
 ```
 
 Now, in Julia install PyCall and PyPlot (see
