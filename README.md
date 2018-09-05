@@ -53,7 +53,7 @@ broken (it freezes the REPL until mouse moves into the graphic window) and
 Gtk3Agg backend is broken with Python2.7 even with the `python-cairocffi`
 Debian package (error message: *TypeError: Couldn't find foreign struct
 converter for 'cairo.Context'*).  Hence, my recommandation is to **use Python
-2.7 with Qt5Agg or Tk frontends**.  Perhaps Qt4Agg or WWAgg work but I did not
+2.7 with Qt5Agg or Tk frontends**.  Perhaps Qt4Agg or WXAgg work but I did not
 tried.
 
 Install packages (depending on which version of Python you want to use, the two
