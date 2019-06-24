@@ -7,6 +7,7 @@ export
     plmat,
     plmat!,
     plg,
+    plh,
     clf,
     fig
 
@@ -244,6 +245,45 @@ function addtitles(title::AbstractString, xlabel::AbstractString,
     length(xlabel) > 0 && plt.xlabel(xlabel)
     length(ylabel) > 0 && plt.ylabel(ylabel)
     nothing
+end
+
+"""
+```julia
+plh(x, y)
+```
+
+plots vector `y` versus vector `x` in *histogram* (or staircase) style.
+The stairs are horizontally centered.
+
+"""
+function plh(x::AbstractVector{Tx},
+             y::AbstractVector{Ty},
+             args...; kwds...) where {Tx<:Real,Ty<:Real}
+    @assert first(axes(x,1)) == 1
+    n = length(x)
+    @assert n ≥ 2
+    @assert first(axes(y,1)) == 1
+    @assert length(y) == n
+    T = float(promote_type(Tx, Ty))
+    xp = Array{T}(undef, 2n)
+    yp = Array{T}(undef, 2n)
+    local x1::T, x2::T
+    h = T(1)/T(2)
+    x1, x2 = T(x[1]), T(x[2])
+    xp[1] = (3*x1 - x2)*h
+    xp[2] = (x1 + x2)*h
+    @inbounds for i in 2:n-1
+        x1, x2 = x2, T(x[i+1])
+        xp[2i-1] = xp[2i-2]
+        xp[2i] = (x1 + x2)*h
+    end
+    xp[2n-1] = xp[2n-2]
+    xp[2n] = (3*x2 - x1)*h
+
+    @inbounds for i in 1:n
+        yp[2i] = yp[2i-1] = T(y[i])
+    end
+    plt.plot(xp, yp, args...; kwds...)
 end
 
 # Deprecations.
