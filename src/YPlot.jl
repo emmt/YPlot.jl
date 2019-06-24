@@ -11,8 +11,8 @@ export
     fig
 
 using Compat
-using PyCall
-using LaTeXStrings
+#using PyCall
+#using LaTeXStrings
 
 import PyPlot
 import PyPlot: clf
@@ -104,7 +104,7 @@ Keywords:
   http://matplotlib.org/examples/color/colormaps_reference.html for available
   colormaps).
 
-- `cbar` specifies whether to add a color bar.  Default is `false`.
+- `cbar` specifies whether to add a color bar.  Default is `true`.
 
 - `title`, `xlabel` and `ylabel` specify the plot title and axis labels.
   Thes can also be specifeied
@@ -124,7 +124,7 @@ Keywords:
 """
 function plmat(A::AbstractMatrix;
                fig = nothing,
-               cbar::Bool = false,
+               cbar::Bool = true,
                clear::Bool = true,
                interp = :nearest,
                cmap = :viridis,
