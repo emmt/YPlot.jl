@@ -1,0 +1,10 @@
+name = "YPlot"
+uuid = "ac3684bf-d7a2-4562-b2cd-6050d7e0f671"
+authors = ["Éric Thiébaut <eric.thiebaut@univ-lyon1.fr>"]
+version = "0.1.0"
+
+[deps]
+PyPlot = "d330b81b-6aea-500a-939a-2ce795aea3ee"
+
+[compat]
+julia = "1.0"
