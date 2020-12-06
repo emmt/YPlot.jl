@@ -11,7 +11,6 @@ export
     clf,
     fig
 
-using Compat
 #using PyCall
 #using LaTeXStrings
 
