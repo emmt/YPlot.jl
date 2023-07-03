@@ -18,59 +18,53 @@ import PyPlot
 import PyPlot: clf
 const plt = PyPlot;
 
+
+const ArrayAxis = Union{Integer,AbstractRange{<:Integer}}
+const ArrayAxes{N} = NTuple{N,ArrayAxis}
+
 #plt.pygui(true)
 
 abstract type Origin end
-struct OriginUpper  <: Origin end
+struct OriginUpper <: Origin end
 struct OriginLower <: Origin end
 
-origintype(val::AbstractString) =
-    (val == "upper" ? OriginUpper :
-     val == "lower" ? OriginLower :
+Origin(val::AbstractString) =
+    (val == "upper" ? OriginUpper() :
+     val == "lower" ? OriginLower() :
      throw(ArgumentError("invalid value \"$val\" for origin")))
 
-origintype(val::Symbol) =
-    (val == :upper ? OriginUpper :
-     val == :lower ? OriginLower :
+Origin(val::Symbol) =
+    (val == :upper ? OriginUpper() :
+     val == :lower ? OriginLower() :
      throw(ArgumentError("invalid value `:$val` for origin")))
 
 
 # Defaults settings for images and matrices.
 
-image_extent(::Type{T}, width::Integer, height::Integer) where {T<:Origin} =
-    extent(T, 0.5, width + 0.5, 0.5, height + 0.5)
-
-image_extent(org::Union{Symbol,AbstractString}, args...) =
-    image_extent(origintype(org), args...)
-
-image_extent(::Type{T}, A::AbstractMatrix) where {T<:Origin} =
-    image_extent(T, size(A))
-
-image_extent(::Type{T}, dims::NTuple{2,Integer}) where {T<:Origin} =
-    image_extent(T, dims...)
-
 image_origin() = :lower
 image_aspect() = :equal
-
-matrix_extent(::Type{T}, nrows, ncols) where {T<:Origin} =
-    extent(T, 0.5, ncols + 0.5, 0.5, nrows + 0.5)
-
-matrix_extent(org::Union{Symbol,AbstractString}, args...) =
-    matrix_extent(origintype(org), args...)
-
-matrix_extent(::Type{T}, A::AbstractMatrix) where {T<:Origin} =
-    matrix_extent(T, size(A))
-
-matrix_extent(::Type{T}, dims::NTuple{2,Integer}) where {T<:Origin} =
-    matrix_extent(T, dims...)
 
 matrix_origin() = :upper
 matrix_aspect() = :equal
 
-extent(::Type{OriginLower}, xmin::Real, xmax::Real, ymin::Real, ymax::Real) =
+axis_extent(dim::Integer) = (0.5, dim + 0.5)
+axis_extent(rng::AbstractRange{<:Integer}) =
+    (first(rng) - step(rng)/2, last(rng) + step(rng)/2)
+
+extent(org::Union{Symbol,AbstractString}, args...) =
+    extent(Origin(org), args...)
+
+extent(org::Origin, I1::ArrayAxis, I2::ArrayAxis) =
+    extent(org, axis_extent(I1)..., axis_extent(I2)...)
+
+extent(org::Origin, I::ArrayAxes{2}) = extent(org, I...)
+
+extent(org::Origin, A::AbstractMatrix) = extent(org, axes(A))
+
+extent(::OriginLower, xmin::Real, xmax::Real, ymin::Real, ymax::Real) =
     (xmin, xmax, ymin, ymax)
 
-extent(::Type{OriginUpper}, xmin::Real, xmax::Real, ymin::Real, ymax::Real) =
+extent(::OriginUpper, xmin::Real, xmax::Real, ymin::Real, ymax::Real) =
     (xmin, xmax, ymax, ymin)
 
 """
@@ -131,8 +125,8 @@ function plmat(A::AbstractMatrix;
                min = nothing,
                max = nothing,
                origin = matrix_origin(),
-               extent = matrix_extent(origin, A),
                aspect = matrix_aspect(),
+               extent = extent(origin, A),
                title = "",
                xlabel = "",
                ylabel = "")
@@ -158,8 +152,8 @@ end
 
 function plimg(A::AbstractMatrix;
                origin = image_origin(),
-               extent = image_extent(origin, A),
                aspect = image_aspect(),
+               extent = extent(origin, A),
                kwds...)
     plmat(permutedims(A);
           aspect=aspect, extent=extent, origin=origin, kwds...)
