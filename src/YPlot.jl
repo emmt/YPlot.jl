@@ -98,7 +98,8 @@ Keywords:
   http://matplotlib.org/examples/color/colormaps_reference.html for available
   colormaps).
 
-- `cbar` specifies whether to add a color bar. Default is `true`.
+- `cbar` specifies whether to add a color bar. Default is `true` for numeraical
+  arrays and `false` for array of Booleans.
 
 - `title`, `xlabel` and `ylabel` specify the plot title and axis labels. Thes
   can also be specifeied
@@ -116,9 +117,9 @@ Keywords:
   extent is set so that coordinates correspond to Julia indices.
 
 """
-function plmat(A::AbstractMatrix;
+function plmat(A::AbstractMatrix{T};
                fig = nothing,
-               cbar::Bool = true,
+               cbar::Bool = (T != Bool),
                clear::Bool = true,
                interp = :nearest,
                cmap = :viridis,
@@ -129,7 +130,7 @@ function plmat(A::AbstractMatrix;
                extent = extent(origin, A),
                title = "",
                xlabel = "",
-               ylabel = "")
+               ylabel = "") where {T}
     preparefigure(fig, clear)
     plt.imshow(A, vmin=min, vmax=max, interpolation=interp,
                cmap=cmap, aspect=aspect, origin=origin, extent=extent)
