@@ -84,7 +84,7 @@ See [`plmat!`](@ref) and [`plimg`](@ref).
 
 """
 function plmat(A::AbstractMatrix{T};
-               fig = nothing,
+               fig = plt.gcf(),
                cbar::Bool = (T != Bool),
                clear::Bool = true,
                interp = "nearest",
@@ -167,7 +167,7 @@ See [`plimg!`](@ref) and [`plmat`](@ref).
 
 """
 function plimg(A::AbstractMatrix{T};
-               fig = nothing,
+               fig = plt.gcf(),
                cbar::Bool = (T != Bool),
                clear::Bool = true,
                interp = "nearest",
