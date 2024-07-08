@@ -23,72 +23,124 @@ const ArrayAxes{N} = NTuple{N,ArrayAxis}
 
 #plt.pygui(true)
 
-abstract type Origin end
-struct OriginUpper <: Origin end
-struct OriginLower <: Origin end
+"""
+    YPlot.matrix_extent(A::AbstractMatrix) -> (left, right, bottom, top)
 
-Origin(val::AbstractString) =
-    (val == "upper" ? OriginUpper() :
-     val == "lower" ? OriginLower() :
-     throw(ArgumentError("invalid value \"$val\" for origin")))
-
-Origin(val::Symbol) =
-    (val == :upper ? OriginUpper() :
-     val == :lower ? OriginLower() :
-     throw(ArgumentError("invalid value `:$val` for origin")))
-
-
-# Defaults settings for images and matrices.
-
-image_origin() = :lower
-image_aspect() = :equal
-
-matrix_origin() = :upper
-matrix_aspect() = :equal
-
-axis_extent(dim::Integer) = (0.5, dim + 0.5)
-axis_extent(rng::AbstractRange{<:Integer}) =
-    (first(rng) - step(rng)/2, last(rng) + step(rng)/2)
-
-extent(org::Union{Symbol,AbstractString}, args...) =
-    extent(Origin(org), args...)
-
-extent(org::Origin, I1::ArrayAxis, I2::ArrayAxis) =
-    extent(org, axis_extent(I1)..., axis_extent(I2)...)
-
-extent(org::Origin, I::ArrayAxes{2}) = extent(org, I...)
-
-extent(org::Origin, A::AbstractMatrix) = extent(org, axes(A))
-
-extent(::OriginLower, xmin::Real, xmax::Real, ymin::Real, ymax::Real) =
-    (xmin, xmax, ymin, ymax)
-
-extent(::OriginUpper, xmin::Real, xmax::Real, ymin::Real, ymax::Real) =
-    (xmin, xmax, ymax, ymin)
+yields extent for displaying a matrix with origin at *upper* left corner so that cells
+have the same indices as the 2-dimensional `A`.
 
 """
-    plmat( A [title,] [ylabel, xlabel,]; kwds...)
-    plimg( A [title,] [xlabel, ylabel,]; kwds...)
-    plmat!(A [title,] [ylabel, xlabel,]; kwds...)
-    plimg!(A [title,] [xlabel, ylabel,]; kwds...)
+function matrix_extent(A::AbstractMatrix)
+    I, J = axes(A)
+    return (firstindex(J) - 0.5, lastindex(J) + 0.5,
+            lastindex(I) + 0.5, firstindex(I) - 0.5)
+end
 
-plot the 2D array `A` as a *matrix* (`plmat` and `plmat!`) or as an *image* (`plimg` and
-`plimg!`).
+"""
+    YPlot.image_extent(A::AbstractMatrix) -> (left, right, bottom, top)
 
-The `plmat` and `plmat!` methods use defaults for the axis extent and orientation suitable
-for a matrix (1st and 2nd dimensions correspond respectively to the rows and columns);
-while the `plimg` and `plimg!` methods use defaults suitable for an image (1st and 2nd
-dimensions correspond respectively to the horizontal and vertical axes).
+yields extent for displaying an image with origin at *lower* left corner so that cells
+have the same indices as the 2-dimensional `A`.
 
-The `plmat!` and `plimg!` methods plot over the existing figure; while `plmat` and `plimg`
-methods clear the figure before plotting.
+"""
+function image_extent(A::AbstractMatrix)
+    I, J = axes(A)
+    return (firstindex(I) - 0.5, lastindex(I) + 0.5,
+            firstindex(J) - 0.5, lastindex(J) + 0.5)
+end
+
+"""
+    plmat(A, [title,] [ylabel, xlabel]; kwds...)
+
+plots the 2-dimensional array `A` as a *matrix*, that is with the first element at the
+upper-left corner and with 1st and 2nd dimensions corresponding respectively to the rows
+and columns.
 
 Keywords:
 
-- `fig` specifies the figure to plot in.  Default is to use the last one.
+- `fig` specifies the figure to plot in. Default is to use the last one.
 
-- `clear` specifies whether to clear the figure before plotting. Default is `false` for
-  `plmat!` and `plimg!` and `true` for `plmat` and `plimg`.
+- `clear` specifies whether to clear the figure before plotting. Default is `true`.
+
+- `min` and `max` specify the lower and upper values to plot.
+
+- `cmap` specifies the colormap to use. Default is `"viridis"` (see
+  http://matplotlib.org/examples/color/colormaps_reference.html for available colormaps).
+
+- `cbar` specifies whether to add a color bar. Default is `true` for numeraical arrays and
+  `false` for array of Booleans.
+
+- `title`, `xlabel` and `ylabel` specify the plot title and axis labels.
+
+- `interp` specifies the interpolation method. By default, the nearest neighbor is used.
+
+- `aspect` specifies the aspect ration of the axis. Can be `"auto"`, `"equal"` or a
+  scalar. By default, `"equal"`.
+
+- `extent = (left, right, bottom, top)` specifies the coordinate limits. By default, the
+  extent is set so that coordinates correspond to Julia indices.
+
+See [`plmat!`](@ref) and [`plimg`](@ref).
+
+"""
+function plmat(A::AbstractMatrix{T};
+               fig = nothing,
+               cbar::Bool = (T != Bool),
+               clear::Bool = true,
+               interp = "nearest",
+               cmap = "viridis",
+               min = nothing,
+               max = nothing,
+               aspect = "equal",
+               extent = matrix_extent(A),
+               title = "",
+               xlabel = "",
+               ylabel = "") where {T}
+    fig = plt.figure(fig, clear=clear)
+    plt.matshow(A; fignum=fig,
+                origin="upper", extent=extent, aspect=aspect,
+                vmin=min, vmax=max, cmap=cmap, interpolation=interp)
+    cbar && plt.colorbar()
+    addtitles(title, xlabel, ylabel)
+end
+
+plmat(A::AbstractMatrix, title::AbstractString; kwds...) =
+    plmat(A; title=title, kwds...)
+
+function plmat(A::AbstractMatrix, ylabel::AbstractString,
+               xlabel::AbstractString; kwds...)
+    plmat(A; xlabel=xlabel, ylabel=ylabel, kwds...)
+end
+
+function plmat(A::AbstractMatrix, title::AbstractString,
+               ylabel::AbstractString, xlabel::AbstractString; kwds...)
+    plmat(A; title=title, xlabel=xlabel, ylabel=ylabel, kwds...)
+end
+
+"""
+    plmat!(A, args...; kwds...)
+
+overplots 2-dimensional array `A` as a *matrix*. This is the same as:
+
+    plmat(A, args...; clear=false, kwds...)
+
+See [`plmat`](@ref) for other arguments and keywords.
+
+"""
+plmat!(A::AbstractMatrix, args...; kwds...) = plmat(args...; clear=false, kwds...)
+
+"""
+    plimg(A, [title,] [xlabel, ylabel]; kwds...)
+
+plots the 2-dimensional array `A` as an *image*, that is with the first pixel at the
+lower-left corner and with 1st and 2nd dimensions corresponding respectively to the
+horizontal and vertical axes
+
+Keywords:
+
+- `fig` specifies the figure to plot in. Default is to use the last one.
+
+- `clear` specifies whether to clear the figure before plotting. Default is `true`.
 
 - `min` and `max` specify the lower and upper values to plot.
 
@@ -108,51 +160,31 @@ Keywords:
 - `origin` specifies the origin of coordinates. Default is `"upper"` for a matrix and
   `"lower"` for an image.
 
-- `extent = (x0,x1,y0,y1)` specifies the coordinate ranges. By default, the extent is set
-  so that coordinates correspond to Julia indices.
+- `extent = (left, right, bottom, top)` specifies the coordinate limits. By default, the
+  extent is set so that coordinates correspond to Julia indices.
+
+See [`plimg!`](@ref) and [`plmat`](@ref).
 
 """
-function plmat(A::AbstractMatrix{T};
+function plimg(A::AbstractMatrix{T};
                fig = nothing,
                cbar::Bool = (T != Bool),
                clear::Bool = true,
-               interp = :nearest,
-               cmap = :viridis,
+               interp = "nearest",
+               cmap = "viridis",
                min = nothing,
                max = nothing,
-               origin = matrix_origin(),
-               aspect = matrix_aspect(),
-               extent = extent(origin, A),
+               aspect = "equal",
+               extent = image_extent(A),
                title = "",
                xlabel = "",
                ylabel = "") where {T}
-    preparefigure(fig, clear)
-    plt.imshow(A, vmin=min, vmax=max, interpolation=interp,
-               cmap=cmap, aspect=aspect, origin=origin, extent=extent)
+    fig = plt.figure(fig, clear=clear)
+    plt.imshow(permutedims(A);
+               origin="lower", extent=extent, aspect=aspect,
+               vmin=min, vmax=max, cmap=cmap, interpolation=interp)
     cbar && plt.colorbar()
     addtitles(title, xlabel, ylabel)
-end
-
-plmat(A::AbstractMatrix, title::AbstractString; kwds...) =
-    plmat(A; title=title, kwds...)
-
-function plmat(A::AbstractMatrix, ylabel::AbstractString,
-               xlabel::AbstractString; kwds...)
-    plmat(A; xlabel=xlabel, ylabel=ylabel, kwds...)
-end
-
-function plmat(A::AbstractMatrix, title::AbstractString,
-               ylabel::AbstractString, xlabel::AbstractString; kwds...)
-    plmat(A; title=title, xlabel=xlabel, ylabel=ylabel, kwds...)
-end
-
-function plimg(A::AbstractMatrix;
-               origin = image_origin(),
-               aspect = image_aspect(),
-               extent = extent(origin, A),
-               kwds...)
-    plmat(permutedims(A);
-          aspect=aspect, extent=extent, origin=origin, kwds...)
 end
 
 plimg(A::AbstractMatrix, title::AbstractString; kwds...) =
@@ -168,17 +200,23 @@ function plimg(A::AbstractMatrix, title::AbstractString,
     plimg(A; title=title, xlabel=xlabel, ylabel=ylabel, kwds...)
 end
 
-plmat!(args...; kwds...) = plmat(args...; clear=false, kwds...)
-plimg!(args...; kwds...) = plimg(args...; clear=false, kwds...)
+"""
+    plimg!(A, args...; kwds...)
 
-@doc @doc(plmat) plmap!
-@doc @doc(plmat) plimg
-@doc @doc(plmat) plimg!
+overplots 2-dimensional array `A` as an *image*. This is the same as:
+
+    plimg(A, args...; clear=false, kwds...)
+
+See [`plimg`](@ref) for other arguments and keywords.
+
+"""
+plimg!(A::AbstractMatrix, args...; kwds...) = plimg(A, args...; clear=false, kwds...)
 
 """
     fig()
 or
     fig(f)
+
 create a new plotting figure or select an existing figure.
 
 """
@@ -203,8 +241,7 @@ clf(f::Union{Integer,plt.Figure}) = (plt.figure(f); plt.clf())
 """
     plg(x, y [, s]; kwds...)
 
-plots 2D curve of `y` versus `x` using symbol/color `s`.  Available keywords
-are:
+plots 2D curve of `y` versus `x` using symbol/color `s`. Available keywords are:
 
 - `fig` specifies the figure to plot in, defaault is to use the last one.
 
@@ -222,14 +259,14 @@ function plg(x, y, s=nothing;
              title::AbstractString = "",
              xlabel::AbstractString = "",
              ylabel::AbstractString = "")
-    preparefigure(fig, clear)
+    fig = plt.figure(fig, clear=clear)
     plt.plot(x, y, s, linewidth=linewidth)
     addtitles(title, xlabel, ylabel)
 end
 
-preparefigure(::Nothing, clear::Bool) = (clear &&  plt.clf(); nothing)
+preparefigure(::Nothing, clear::Bool) = (clear && plt.clf(); nothing)
 preparefigure(fig::Union{Integer,plt.Figure}, clear::Bool) =
-    (plt.figure(fig); clear &&  plt.clf(); nothing)
+    (plt.figure(fig, clear=clear); nothing)
 
 function addtitles(title::AbstractString, xlabel::AbstractString,
                    ylabel::AbstractString)
