@@ -1,10 +1,10 @@
 name = "YPlot"
 uuid = "ac3684bf-d7a2-4562-b2cd-6050d7e0f671"
 authors = ["Éric Thiébaut <https://github.com/emmt>"]
-version = "0.1.1"
+version = "0.2.0"
 
 [deps]
 "PythonPlot" = "274fc56d-3b97-40fa-a1cd-1b4a50311bf9"
 
 [compat]
-julia = "1.0"
+julia = "1"
