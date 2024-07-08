@@ -1,7 +1,7 @@
 # YPlot.jl
 
-A very simple plotting package for Julia.  For now, the backend is
-[PyPlot](https://github.com/stevengj/PyPlot.jl), the syntax is somewhat
+A very simple plotting package for Julia.  For now, the back-end is
+[PythonPlot](https://github.com/JuliaPy/PythonPlot.jl), the syntax is somewhat
 reminiscent of Yorick.
 
 The initial objective was to cope with the displaying 2D Julia arrays with axes

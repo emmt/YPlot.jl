@@ -14,9 +14,9 @@ export
 #using PyCall
 #using LaTeXStrings
 
-import PyPlot
-import PyPlot: clf
-const plt = PyPlot;
+import PythonPlot
+import PythonPlot: clf
+const plt = PythonPlot;
 
 
 const ArrayAxis = Union{Integer,AbstractRange{<:Integer}}
