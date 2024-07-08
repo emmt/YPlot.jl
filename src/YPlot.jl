@@ -18,7 +18,6 @@ import PythonPlot
 import PythonPlot: clf
 const plt = PythonPlot;
 
-
 const ArrayAxis = Union{Integer,AbstractRange{<:Integer}}
 const ArrayAxes{N} = NTuple{N,ArrayAxis}
 
@@ -73,48 +72,44 @@ extent(::OriginUpper, xmin::Real, xmax::Real, ymin::Real, ymax::Real) =
     plmat!(A [title,] [ylabel, xlabel,]; kwds...)
     plimg!(A [title,] [xlabel, ylabel,]; kwds...)
 
-plot the 2D array `A` as a *matrix* (`plmat` and `plmat!`) or as an *image*
-(`plimg` and `plimg!`).
+plot the 2D array `A` as a *matrix* (`plmat` and `plmat!`) or as an *image* (`plimg` and
+`plimg!`).
 
-The `plmat` and `plmat!` methods use defaults for the axis extent and
-orientation suitable for a matrix (1st and 2nd dimensions correspond
-respectively to the rows and columns); while the `plimg` and `plimg!` methods
-use defaults suitable for an image (1st and 2nd dimensions correspond
-respectively to the horizontal and vertical axes).
+The `plmat` and `plmat!` methods use defaults for the axis extent and orientation suitable
+for a matrix (1st and 2nd dimensions correspond respectively to the rows and columns);
+while the `plimg` and `plimg!` methods use defaults suitable for an image (1st and 2nd
+dimensions correspond respectively to the horizontal and vertical axes).
 
-The `plmat!` and `plimg!` methods plot over the existing figure; while `plmat`
-and `plimg` methods clear the figure before plotting.
+The `plmat!` and `plimg!` methods plot over the existing figure; while `plmat` and `plimg`
+methods clear the figure before plotting.
 
 Keywords:
 
 - `fig` specifies the figure to plot in.  Default is to use the last one.
 
-- `clear` specifies whether to clear the figure before plotting. Default is
-  `false` for `plmat!` and `plimg!` and `true` for `plmat` and `plimg`.
+- `clear` specifies whether to clear the figure before plotting. Default is `false` for
+  `plmat!` and `plimg!` and `true` for `plmat` and `plimg`.
 
 - `min` and `max` specify the lower and upper values to plot.
 
 - `cmap` specifies the colormap to use. Default is `"viridis"` (see
-  http://matplotlib.org/examples/color/colormaps_reference.html for available
-  colormaps).
+  http://matplotlib.org/examples/color/colormaps_reference.html for available colormaps).
 
-- `cbar` specifies whether to add a color bar. Default is `true` for numeraical
-  arrays and `false` for array of Booleans.
+- `cbar` specifies whether to add a color bar. Default is `true` for numeraical arrays and
+  `false` for array of Booleans.
 
-- `title`, `xlabel` and `ylabel` specify the plot title and axis labels. Thes
-  can also be specifeied
+- `title`, `xlabel` and `ylabel` specify the plot title and axis labels.
 
-- `interp` specifies the interpolation method. By default, the nearest neighbor
-  is used.
+- `interp` specifies the interpolation method. By default, the nearest neighbor is used.
 
-- `aspect` specifies the aspect ration of the axis. Can be `"auto"`, `"equal"`
-  or a scalar. By default, `"equal"`.
+- `aspect` specifies the aspect ration of the axis. Can be `"auto"`, `"equal"` or a
+  scalar. By default, `"equal"`.
 
-- `origin` specifies the origin of coordinates. Default is `"upper"` for a
-  matrix and `"lower"` for an image.
+- `origin` specifies the origin of coordinates. Default is `"upper"` for a matrix and
+  `"lower"` for an image.
 
-- `extent = (x0,x1,y0,y1)` specifies the coordinate ranges. By default, the
-  extent is set so that coordinates correspond to Julia indices.
+- `extent = (x0,x1,y0,y1)` specifies the coordinate ranges. By default, the extent is set
+  so that coordinates correspond to Julia indices.
 
 """
 function plmat(A::AbstractMatrix{T};
@@ -212,10 +207,13 @@ plots 2D curve of `y` versus `x` using symbol/color `s`.  Available keywords
 are:
 
 - `fig` specifies the figure to plot in, defaault is to use the last one.
-- `clear` specifies whether to clear the figure before plotting, default is
-  false.
+
+- `clear` specifies whether to clear the figure before plotting, default is false.
+
 - `title`, `xlabel` and `ylabel` specify the plot title and axis labels.
+
 - `linewidth` specifies the line width.
+
 """
 function plg(x, y, s=nothing;
              fig = nothing,
@@ -242,12 +240,10 @@ function addtitles(title::AbstractString, xlabel::AbstractString,
 end
 
 """
-```julia
-plh(x, y)
-```
+    plh(x, y)
 
-plots vector `y` versus vector `x` in *histogram* (or staircase) style.
-The stairs are horizontally centered.
+plots vector `y` versus vector `x` in *histogram* (or staircase) style. The stairs are
+horizontally centered.
 
 """
 function plh(x::AbstractVector{Tx},
