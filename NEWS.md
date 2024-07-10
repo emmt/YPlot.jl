@@ -6,4 +6,4 @@
 
 ## Version 0.2.0
 
-- Use `PythonPlot` instead of `PyPlot.
+- Use `PythonPlot` instead of `PyPlot`.
