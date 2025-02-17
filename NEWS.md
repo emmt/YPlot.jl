@@ -1,5 +1,7 @@
 # User visible changes in `YPlot`
 
+## Version 0.2.2
+
 - Can plot `OffsetArray` with `plimg` and `plmat`.
 
 ## Version 0.2.1
