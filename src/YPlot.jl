@@ -11,15 +11,14 @@ export
     clf,
     fig
 
-#using PyCall
-#using LaTeXStrings
+using Backport
+@backport
+
+using OffsetArrays
 
 import PythonPlot
 import PythonPlot: clf
 const plt = PythonPlot;
-
-const ArrayAxis = Union{Integer,AbstractRange{<:Integer}}
-const ArrayAxes{N} = NTuple{N,ArrayAxis}
 
 #plt.pygui(true)
 
@@ -29,7 +28,8 @@ const ArrayAxes{N} = NTuple{N,ArrayAxis}
 yields extent for displaying a matrix with origin at *upper* left corner so that cells
 have the same indices as the 2-dimensional `A`.
 
-"""
+""" matrix_extent
+@public matrix_extent
 function matrix_extent(A::AbstractMatrix)
     I, J = axes(A)
     return (firstindex(J) - 0.5, lastindex(J) + 0.5,
@@ -42,12 +42,33 @@ end
 yields extent for displaying an image with origin at *lower* left corner so that cells
 have the same indices as the 2-dimensional `A`.
 
-"""
+""" image_extent
+@public image_extent
 function image_extent(A::AbstractMatrix)
     I, J = axes(A)
     return (firstindex(I) - 0.5, lastindex(I) + 0.5,
             firstindex(J) - 0.5, lastindex(J) + 0.5)
 end
+
+"""
+    YPlot.get_matrix(A::AbstractMatrix)
+
+yields the matrix to plot by `PythonPlot.matshow` given 2-dimensional array `A`.
+
+""" get_matrix
+@public get_matrix
+get_matrix(A::AbstractMatrix) = A
+get_matrix(A::OffsetMatrix) = parent(A)
+
+"""
+    YPlot.get_image(A::AbstractMatrix)
+
+yields the image to plot with `PythonPlot.imshow` given 2-dimensional array `A`.
+
+""" get_image
+@public get_image
+get_image(A::AbstractMatrix) = permutedims(A)
+get_image(A::OffsetMatrix) = permutedims(parent(A))
 
 """
     plmat(A, [title,] [ylabel, xlabel]; kwds...)
@@ -97,7 +118,7 @@ function plmat(A::AbstractMatrix{T};
                xlabel = "",
                ylabel = "") where {T}
     fig = plt.figure(fig, clear=clear)
-    plt.matshow(A; fignum=fig,
+    plt.matshow(get_matrix(A); fignum=fig,
                 origin="upper", extent=extent, aspect=aspect,
                 vmin=min, vmax=max, cmap=cmap, interpolation=interp)
     cbar && plt.colorbar()
@@ -180,7 +201,7 @@ function plimg(A::AbstractMatrix{T};
                xlabel = "",
                ylabel = "") where {T}
     fig = plt.figure(fig, clear=clear)
-    plt.imshow(permutedims(A);
+    plt.imshow(get_image(A);
                origin="lower", extent=extent, aspect=aspect,
                vmin=min, vmax=max, cmap=cmap, interpolation=interp)
     cbar && plt.colorbar()
@@ -243,7 +264,7 @@ clf(f::Union{Integer,plt.Figure}) = (plt.figure(f); plt.clf())
 
 plots 2D curve of `y` versus `x` using symbol/color `s`. Available keywords are:
 
-- `fig` specifies the figure to plot in, defaault is to use the last one.
+- `fig` specifies the figure to plot in, default is to use the last one.
 
 - `clear` specifies whether to clear the figure before plotting, default is false.
 

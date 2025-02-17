@@ -13,13 +13,22 @@ Example:
 
 ```julia
 using YPlot
-A = randn(4,7)
-plmat(A, "As a matrix", "row index", "column index"; fig=1)
-plimg(A, "As an image", "x", "y"; cbar=true, fig=2)
+A = reshape(1:12, 3, 4);
+plmat(A, "Plotting A[i,j] as a matrix", "i (row index)", "j (column index)"; fig=1)
+plimg(A, "Plotting A[x,y] as an image", "x", "y"; cbar=true, fig=2)
 ```
 
 will display the 2D array 4×7 array `A` as a matrix in figure 1 and as an image (with a
 color bar) in figure 2.
+
+Array may also have offsets:
+
+```julia
+using YPlot, OffseArrays
+A = OffsetArray(reshape(1:12, 3, 4), -2:0, -1:2);
+plmat(A, "Plotting A[i,j] as a matrix", "i (row index)", "j (column index)"; fig=1)
+plimg(A, "Plotting A[x,y] as an image", "x", "y"; fig=2)
+```
 
 
 ## Wish List
@@ -50,7 +59,7 @@ how to do that on [Ubuntu](https://www.ubuntu.com/) (or similar like
 ***Important*** As of Julia 1.0 and PyPlot 2.2.2, interaction with Python3 is broken (it
 freezes the REPL until mouse moves into the graphic window) and Gtk3Agg backend is broken
 with Python2.7 even with the `python-cairocffi` Debian package (error message: *TypeError:
-Couldn't find foreign struct converter for 'cairo.Context'*). Hence, my recommandation is
+Couldn't find foreign struct converter for 'cairo.Context'*). Hence, my recommendation is
 to **use Python 2.7 with Qt5Agg or Tk frontends**. Perhaps Qt4Agg or WXAgg work but I did
 not tried.
 
